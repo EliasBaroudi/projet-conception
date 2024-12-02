@@ -1,5 +1,5 @@
-def test_addition(a,b):
+def addition(a,b):
     return (a+b)
 
-def test_soustraction(a,b):
+def soustraction(a,b):
     return(a-b)
