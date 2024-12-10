@@ -38,27 +38,26 @@ def test_broadcast_pseudos():
 
 # === TESTS POUR CLIENTGAME ===
 
-# Les patchs servent à empecher l'ouverture de fenetres réelles pendant le test puisqu'elles posent probleme
-
-@patch('tkinter.Tk', MagicMock())   # On utilsie donc des Mock pour simuler les entrées utilisateurs comme le texte par exemple
+# Mock de tkinter complet
+@patch('tkinter.Tk', MagicMock())  
 @patch('tkinter.Entry', MagicMock())
-@patch('tkinter.Toplevel', MagicMock())  # Ajouter également le mock pour Toplevel
+@patch('tkinter.Toplevel', MagicMock())  # Mock de Toplevel aussi
 def test_client_connection():
     with patch('socket.socket') as mock_socket:
         mock_server_conn = Mock()
         mock_socket.return_value = mock_server_conn
 
         client = ClientGame()
-        client.entry_ip.get = Mock(return_value='127.0.0.1')
+        client.entry_ip.get = Mock(return_value='127.0.0.1')  # Simuler l'IP correcte
         client.entry_pseudo.get = Mock(return_value='Alice')
         
         client.connect_to_server()
-        mock_server_conn.connect.assert_called_with(('127.0.0.1', 16383))
+        mock_server_conn.connect.assert_called_with(('127.0.0.1', 16383))  # Vérifier la bonne connexion
         mock_server_conn.sendall.assert_called_with(b'Alice')
 
 @patch('tkinter.Tk', MagicMock())
 @patch('tkinter.Entry', MagicMock())
-@patch('tkinter.Toplevel', MagicMock())  # Ajouter également le mock pour Toplevel
+@patch('tkinter.Toplevel', MagicMock())
 def test_client_listen_to_server():
     with patch('socket.socket') as mock_socket:
         mock_conn = Mock()
