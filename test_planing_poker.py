@@ -1,8 +1,8 @@
 import pytest
 import socket
 import threading
-import os
 from unittest.mock import Mock, patch, MagicMock
+import os
 import tkinter as tk
 from interfacev2 import HostGame, ClientGame, PlanningPokerApp
 
@@ -42,6 +42,7 @@ def test_broadcast_pseudos():
 
 @patch('tkinter.Tk', MagicMock())   # On utilsie donc des Mock pour simuler les entrées utilisateurs comme le texte par exemple
 @patch('tkinter.Entry', MagicMock())
+@patch('tkinter.Toplevel', MagicMock())  # Ajouter également le mock pour Toplevel
 def test_client_connection():
     with patch('socket.socket') as mock_socket:
         mock_server_conn = Mock()
@@ -57,6 +58,7 @@ def test_client_connection():
 
 @patch('tkinter.Tk', MagicMock())
 @patch('tkinter.Entry', MagicMock())
+@patch('tkinter.Toplevel', MagicMock())  # Ajouter également le mock pour Toplevel
 def test_client_listen_to_server():
     with patch('socket.socket') as mock_socket:
         mock_conn = Mock()
@@ -77,12 +79,14 @@ def test_client_listen_to_server():
 # Marquer les tests GUI pour les ignorer si DISPLAY est manquant
 @pytest.mark.skipif('DISPLAY' not in os.environ, reason="Tests GUI ignorés sans DISPLAY")
 @patch('tkinter.Tk', MagicMock())
+@patch('tkinter.Toplevel', MagicMock())  # Mock de Toplevel aussi
 def test_setup_main_menu():
     app = PlanningPokerApp()
     assert app.main is not None
 
 @pytest.mark.skipif('DISPLAY' not in os.environ, reason="Tests GUI ignorés sans DISPLAY")
 @patch('tkinter.Tk', MagicMock())
+@patch('tkinter.Toplevel', MagicMock())  # Mock de Toplevel aussi
 def test_clear_window():
     app = PlanningPokerApp()
     app.main.winfo_children = Mock(return_value=[Mock()])
@@ -92,6 +96,7 @@ def test_clear_window():
 # === MOCK POUR SIMULER UNE PARTIE COMPLETE ===
 
 @patch('tkinter.Tk', MagicMock())
+@patch('tkinter.Toplevel', MagicMock())  # Mock de Toplevel aussi
 def test_full_game_flow():
     with patch('socket.socket') as mock_socket:
         mock_host_conn = Mock()
