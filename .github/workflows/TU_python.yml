@@ -27,6 +27,6 @@ jobs:
 
     - name: Run tests and generate HTML report
       run: |
-        pytest test_calculatrice.py
+        pytest test_planing_poker.py
       env:
         CI: true
