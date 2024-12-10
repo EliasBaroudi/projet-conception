@@ -1,6 +1,7 @@
 import pytest
 import socket
 import threading
+import os
 from unittest.mock import Mock, patch, MagicMock
 import tkinter as tk
 from interfacev2 import HostGame, ClientGame, PlanningPokerApp
