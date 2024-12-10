@@ -3,7 +3,7 @@ import socket
 import threading
 from unittest.mock import Mock, patch
 import tkinter as tk
-from planning_poker_app import HostGame, ClientGame, PlanningPokerApp
+from interfacev2 import HostGame, ClientGame, PlanningPokerApp
 
 # === TESTS POUR HOSTGAME ===
 
