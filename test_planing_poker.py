@@ -73,14 +73,14 @@ def test_client_listen_to_server():
 
 # === TEST POUR PLANNINGPOKERAPP ===
 
-# Marquer les tests GUI pour les ignorer
-@pytest.mark.skip(reason="Tests GUI ignorés")
+# Marquer les tests GUI pour les ignorer si DISPLAY est manquant
+@pytest.mark.skipif('DISPLAY' not in os.environ, reason="Tests GUI ignorés sans DISPLAY")
 @patch('tkinter.Tk', MagicMock())
 def test_setup_main_menu():
     app = PlanningPokerApp()
     assert app.main is not None
 
-@pytest.mark.skip(reason="Tests GUI ignorés")
+@pytest.mark.skipif('DISPLAY' not in os.environ, reason="Tests GUI ignorés sans DISPLAY")
 @patch('tkinter.Tk', MagicMock())
 def test_clear_window():
     app = PlanningPokerApp()
