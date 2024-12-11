@@ -1,7 +1,9 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import socket
 import threading
+import json
+from collections import Counter
 
 # Classe pour gérer l'interface
 class PlanningPokerApp:
@@ -43,7 +45,7 @@ class HostGame:
         self.window.title("Hôte - Planning Poker")
         self.setup_host_interface()
         self.start_server_thread()
-    
+
     # Recuperer l'ip de l'hôte
     def get_ip_address(self):
         try:
@@ -57,12 +59,39 @@ class HostGame:
 
     # Interface de l'hôte pour inviter d'autres joueurs
     def setup_host_interface(self):
+
         tk.Label(self.window, text=f"Votre IP : {self.IP}").pack(pady=5)
         tk.Label(self.window, text="Communiquez votre IP aux joueurs pour rejoindre.").pack(pady=5)
+
         self.table = ttk.Treeview(self.window, columns=("Pseudo"), show="headings")
         self.table.heading("Pseudo", text="Pseudos")
         self.table.pack(pady=5)
-        tk.Button(self.window, text="Lancer la Partie", command=self.start_game).pack(pady=10)
+
+        tk.Label(self.window, text="Mode de jeu :")
+        options = ['Moyenne','Mediane','Majorité absolue','Majorité relative']
+
+        self.choix_var = tk.StringVar(self.window)
+        self.choix_var.set(options[0])
+        self.choix = tk.OptionMenu(self.window, self.choix_var, *options)
+        self.choix.pack(pady=20)
+
+        tk.Button(self.window, text="Parcourir backlog", command=self.parcourir).pack(pady=10)
+
+    def parcourir(self):
+        path = filedialog.askopenfilename(
+            title="Sélectionnez un fichier JSON",
+            filetypes=[("Fichiers JSON", "*.json"), ("Tous les fichiers", "*.*")]
+        )
+        if path:
+            with open(path, "r", encoding="utf-8") as file:
+                print('fichier chargé')
+                self.backlog = json.load(file)
+                tk.Button(self.window, text="Lancer la Partie", command=self.start_game).pack(pady=10)
+                result = tk.Label(self.window, text="Fichier chargé avec succès")
+                self.window.lift()
+        else:
+            result = tk.Label(self.window, text="Aucun fichier chargé.")
+        result.pack()
 
     def start_server_thread(self):
         threading.Thread(target=self.listen_for_clients, daemon=True).start()
@@ -109,36 +138,104 @@ class HostGame:
         # Future implementation: Launch the game loop here.
 
     def start_game_loop(self):
-        # Interface principale pour la partie
+        self.mode = self.choix_var.get()
+        print(self.mode)
+
         game_window = tk.Toplevel()
         game_window.title("Planning Poker - Partie en cours")
 
-        # Exemple d'affichage d'une question
-        tk.Label(game_window, text="Question : Estimez la tâche suivante ?").pack(pady=10)
+        # On parcourt toutes les questions dans le backlog
+        for key, value in self.backlog.items():
+            question = value
 
-        # Zone pour votes des joueurs
-        self.vote_result = tk.StringVar(value="En attente des votes...")
-        tk.Label(game_window, textvariable=self.vote_result).pack(pady=10)
+            # Interface principale pour la partie
 
-        # Logique simple pour collecter les votes
-        self.collect_votes(game_window)
+            print(question)
 
-    def collect_votes(self, window):
-        # Exemple : Simuler l'attente des votes des clients
-        def wait_for_votes():
-            while True:
-                votes = []
-                for client in self.clients:
-                    try:
-                        vote = client.recv(1024).decode()
-                        votes.append(vote)
-                    except:
-                        pass
-                if len(votes) == len(self.clients):  # Si tous les votes sont reçus
-                    self.vote_result.set(f"Votes reçus : {', '.join(votes)}")
-                    break
+            condition = False
+            while not condition:
+                tk.Label(game_window, text=f"Estimez la tâche suivante : {question}").pack()       
+                tk.Label(game_window, text=f"En attente des votes... ").pack()
 
-        threading.Thread(target=wait_for_votes, daemon=True).start()
+                game_window.update()
+
+                # Démarre la collecte des votes
+                self.collect_votes(game_window)
+
+                match self.mode:
+                    case 'Moyenne':
+
+                        lst = list(map(float, self.votes))
+                        avg = sum(lst) / len(lst)
+                        # Anticiper la sauvegarde du resultat dans un fichier de sortie (avg)
+                        tk.Label(game_window, text=f"Moyenne : {avg}").pack()
+
+                        condition = True
+
+                    case 'Mediane':
+
+                        lst = sorted(map(float, self.votes))  # Convertir en nombres et trier
+                        n = len(lst)
+                        milieu = n // 2
+
+                        if n % 2 == 0:
+                            med = (lst[milieu - 1] + lst[milieu]) / 2
+                        else:
+                            med = lst[milieu]
+        
+                        tk.Label(game_window, text=f"Mediane : {med}").pack()
+                        condition = True
+
+                    case 'Majorité absolue':
+
+                        if len(set(self.votes)) == 1:
+                            # Anticiper la sauvegarde du resultat dans un fichier de sortie (self.votes[0])
+                            tk.Label(game_window, text=f"Majorité absolue ! : {self.votes[0]}").pack()   
+                            condition = True
+                        else:
+                            tk.Label(game_window, text=f"Pas de majorité absolue..").pack()   
+
+                    case 'Majorité relative':
+
+                        count = Counter(self.votes)
+                        most_common = count.most_common(1)
+                        if most_common:
+                            value, freq = most_common[0]
+                            if freq > len(self.votes) / 2:
+                                # Anticiper la sauvegarde du resultat dans un fichier de sortie (value)
+                                tk.Label(game_window, text=f"Majorité relative ! : {value}").pack()
+                                condition = True
+
+                        tk.Label(game_window, text=f"Pas de majorité relative..").pack()
+
+
+                game_window.update()
+
+        # fin de la partie enregistrement des tâches
+
+    def collect_votes(self, game_window):
+        self.votes = []  # Liste pour stocker les votes
+        
+        while len(self.votes) < len(self.clients):  
+            # On essaie de recevoir les votes de chaque client
+            for client in self.clients:
+                try:
+                    vote = client.recv(1024).decode()  # Recevoir un vote
+                    self.votes.append(vote)
+
+                    ## Envoyer un signal à l'interface du client concerné pour desactiver son interface
+
+                except:
+                    continue
+
+        # Si tous les votes sont reçus, afficher les résultats
+        tk.Label(game_window, text=f"Votes reçus : {', '.join(self.votes)}").pack()
+        print(self.votes)  # Affiche les votes reçus
+
+    def clear_window(self):
+        for widget in self.window.winfo_children():
+            widget.destroy()
+    
 
 # Classe pour rejoindre une partie
 class ClientGame:
