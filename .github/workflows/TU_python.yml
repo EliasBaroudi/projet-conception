@@ -25,6 +25,6 @@ jobs:
     
     - name: Run tests
       run: |
-        pytest test.py
+        pytest src/test.py
       env:
         CI: true
