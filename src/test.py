@@ -4,148 +4,170 @@ import socket
 import threading
 import time
 from unittest.mock import MagicMock, patch
+import tkinter as tk
 
-# Import the classes from the original script
+# Importer les classes du script original
 from interfacev4 import PlanningPokerApp, HostGame, ClientGame
+
+# Créer une racine Tkinter mockée pour les tests
+def mock_tk_root():
+    """
+    Crée un mock pour la racine Tkinter pour éviter les interactions graphiques réelles.
+    """
+    root = MagicMock(spec=tk.Tk)
+    root.title = MagicMock()
+    root.geometry = MagicMock()
+    root.mainloop = MagicMock()
+    root.protocol = MagicMock()
+    return root
 
 def test_get_ip_address():
     """
-    Test the get_ip_address method of HostGame
-    Ensures it returns a valid IP address format
+    Tester la méthode get_ip_address de HostGame
+    Vérifie que l'adresse IP retournée a un format valide
     """
     host_game = HostGame()
-    ip = host_game.get_ip_address()
     
-    # Check IP address format
-    assert isinstance(ip, str), "IP should be a string"
+    # Remplacer la création de la fenêtre Tkinter par un mock
+    with patch('tkinter.Tk', return_value=mock_tk_root()):
+        ip = host_game.get_ip_address()
     
-    # Basic IP address validation (IPv4)
+    # Vérifier le format de l'adresse IP
+    assert isinstance(ip, str), "L'IP doit être une chaîne de caractères"
+    
+    # Validation basique de l'adresse IPv4
     ip_parts = ip.split('.')
-    assert len(ip_parts) == 4, "IP should have 4 parts"
+    assert len(ip_parts) == 4, "L'IP doit avoir 4 parties"
     
     for part in ip_parts:
-        assert part.isdigit(), "IP parts should be numeric"
-        assert 0 <= int(part) <= 255, "IP parts should be between 0 and 255"
+        assert part.isdigit(), "Les parties de l'IP doivent être numériques"
+        assert 0 <= int(part) <= 255, "Les parties de l'IP doivent être entre 0 et 255"
 
 def test_backlog_loading():
     """
-    Test the backlog loading functionality
+    Tester le chargement du backlog
     """
-    host_game = HostGame()
-    
-    # Create a temporary JSON file for testing
-    test_backlog = {
-        "1": "First task estimation",
-        "2": "Second task estimation"
-    }
-    
-    with patch('tkinter.filedialog.askopenfilename', return_value='test_backlog.json'):
+    # Mocker la racine Tkinter et la boîte de dialogue de fichier
+    with patch('tkinter.Tk', return_value=mock_tk_root()), \
+         patch('tkinter.filedialog.askopenfilename', return_value='test_backlog.json'):
+        
+        host_game = HostGame()
+        
+        # Créer un fichier JSON temporaire pour le test
+        test_backlog = {
+            "1": "Estimation de la première tâche",
+            "2": "Estimation de la deuxième tâche"
+        }
+        
         with open('test_backlog.json', 'w', encoding='utf-8') as f:
             json.dump(test_backlog, f)
         
         host_game.parcourir()
         
-        assert hasattr(host_game, 'backlog'), "Backlog should be loaded"
-        assert host_game.backlog == test_backlog, "Backlog content should match test data"
+        assert hasattr(host_game, 'backlog'), "Le backlog doit être chargé"
+        assert host_game.backlog == test_backlog, "Le contenu du backlog doit correspondre aux données de test"
 
 def test_client_connection():
     """
-    Test client connection process
-    This is a mock test since we can't create actual network connections in a unit test
+    Tester le processus de connexion du client
+    C'est un test simulé car on ne peut pas créer de connexions réseau réelles dans un test unitaire
     """
-    client_game = ClientGame()
-    
-    # Mock socket connection
-    with patch('socket.socket') as mock_socket:
-        # Simulate successful connection
-        mock_instance = mock_socket.return_value
-        mock_instance.connect.return_value = None
+    # Mocker la racine Tkinter
+    with patch('tkinter.Tk', return_value=mock_tk_root()):
+        client_game = ClientGame()
         
-        # Set up test inputs
-        client_game.entry_ip = MagicMock()
-        client_game.entry_ip.get.return_value = '127.0.0.1'
-        
-        client_game.entry_pseudo = MagicMock()
-        client_game.entry_pseudo.get.return_value = 'TestUser'
-        
-        # Mock the connection method
-        with patch.object(client_game, 'setup_waiting_interface') as mock_waiting:
-            client_game.connect_to_server()
+        # Mocker la connexion socket
+        with patch('socket.socket') as mock_socket:
+            # Simuler une connexion réussie
+            mock_instance = mock_socket.return_value
+            mock_instance.connect.return_value = None
             
-            # Verify connection attempts
-            mock_socket.assert_called_once()
-            mock_instance.connect.assert_called_once_with(('127.0.0.1', 16383))
-            mock_waiting.assert_called_once()
+            # Configurer les entrées de test
+            client_game.entry_ip = MagicMock()
+            client_game.entry_ip.get.return_value = '127.0.0.1'
+            
+            client_game.entry_pseudo = MagicMock()
+            client_game.entry_pseudo.get.return_value = 'UtilisateurTest'
+            
+            # Mocker la méthode de connexion
+            with patch.object(client_game, 'setup_waiting_interface') as mock_waiting:
+                client_game.connect_to_server()
+                
+                # Vérifier les tentatives de connexion
+                mock_socket.assert_called_once()
+                mock_instance.connect.assert_called_once_with(('127.0.0.1', 16383))
+                mock_waiting.assert_called_once()
 
 def test_vote_processing():
     """
-    Test vote processing logic
+    Tester la logique de traitement des votes
     """
-    from unittest.mock import MagicMock, patch
-    import pytest
-
-    host_game = HostGame()
-    
-    # Simulate votes with string values
-    test_votes = [
-        ["User1", "5"],
-        ["User2", "8"],
-        ["User3", "5"]
-    ]
-    
-    # Mock the clients to have a recv method that returns vote strings
-    mock_clients = []
-    for user, vote in test_votes:
-        mock_client = MagicMock()
-        mock_client.recv.return_value = f"{user};{vote}".encode()
-        mock_clients.append(mock_client)
-    
-    host_game.clients = mock_clients
-    host_game.full_list = test_votes
-    host_game.votes = [vote[1] for vote in test_votes]
-    
-    # Mocked game window for collect_votes method
-    mock_game_window = MagicMock()
-    
-    # Test different modes
-    test_modes = [
-        ('Moyenne', True),
-        ('Majorité absolue', True),
-        ('Majorité relative', True)
-    ]
-    
-    for mode, _ in test_modes:
-        host_game.mode = mode
+    # Mocker la racine Tkinter
+    with patch('tkinter.Tk', return_value=mock_tk_root()):
+        host_game = HostGame()
         
-        # Patch the socket receive method to return predefined votes
-        with patch('socket.socket.recv', side_effect=[f"{user};{vote}".encode() for user, vote in test_votes]):
-            try:
-                host_game.collect_votes(mock_game_window)
-            except Exception as e:
-                pytest.fail(f"Collect votes failed for mode {mode}: {e}")
+        # Simuler des votes avec des valeurs de chaînes
+        test_votes = [
+            ["Utilisateur1", "5"],
+            ["Utilisateur2", "8"],
+            ["Utilisateur3", "5"]
+        ]
+        
+        # Mocker les clients pour qu'ils retournent des chaînes de votes
+        mock_clients = []
+        for user, vote in test_votes:
+            mock_client = MagicMock()
+            mock_client.recv.return_value = f"{user};{vote}".encode()
+            mock_clients.append(mock_client)
+        
+        host_game.clients = mock_clients
+        host_game.full_list = test_votes
+        host_game.votes = [vote[1] for vote in test_votes]
+        
+        # Fenêtre de jeu mockée pour la méthode collect_votes
+        mock_game_window = MagicMock()
+        
+        # Tester différents modes
+        test_modes = [
+            'Moyenne',
+            'Majorité absolue', 
+            'Majorité relative'
+        ]
+        
+        for mode in test_modes:
+            host_game.mode = mode
+            
+            # Mocker la réception socket pour retourner les votes prédéfinis
+            with patch('socket.socket.recv', side_effect=[f"{user};{vote}".encode() for user, vote in test_votes]):
+                try:
+                    host_game.collect_votes(mock_game_window)
+                except Exception as e:
+                    pytest.fail(f"La collecte des votes a échoué pour le mode {mode} : {e}")
                 
 def test_configuration_initialization():
     """
-    Test initial configuration of the app
+    Tester l'initialisation de la configuration de l'application
     """
-    # Use patch to prevent actual window creation
-    with patch('tkinter.Tk'):
+    # Mocker la racine Tkinter
+    with patch('tkinter.Tk', return_value=mock_tk_root()):
         app = PlanningPokerApp()
         
-        # Check basic properties (mocked)
-        assert hasattr(app, 'main'), "App should have a main window"
-        assert hasattr(app, 'PORT'), "App should have a PORT attribute"
+        # Vérifier les propriétés de base (mockées)
+        assert hasattr(app, 'main'), "L'application doit avoir une fenêtre principale"
+        assert hasattr(app, 'PORT'), "L'application doit avoir un attribut PORT"
 
 def test_server_initialization():
     """
-    Test server initialization in HostGame
+    Tester l'initialisation du serveur dans HostGame
     """
-    host_game = HostGame()
-    
-    assert hasattr(host_game, 'PORT'), "Host should have a PORT attribute"
-    assert host_game.PORT == 16383, "Default port should be 16383"
-    assert hasattr(host_game, 'clients'), "Host should have a clients list"
-    assert len(host_game.clients) == 0, "Clients list should initially be empty"
+    # Mocker la racine Tkinter
+    with patch('tkinter.Tk', return_value=mock_tk_root()):
+        host_game = HostGame()
+        
+        assert hasattr(host_game, 'PORT'), "L'hôte doit avoir un attribut PORT"
+        assert host_game.PORT == 16383, "Le port par défaut doit être 16383"
+        assert hasattr(host_game, 'clients'), "L'hôte doit avoir une liste de clients"
+        assert len(host_game.clients) == 0, "La liste des clients doit être initialement vide"
 
 if __name__ == '__main__':
     pytest.main()
