@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
+from tkinter import font as tkfont
 import socket
 import threading
 import json
@@ -32,7 +33,8 @@ class PlanningPokerApp:
 
         main = tk.Tk()
         main.title("Planning Poker")
-        main.geometry("1080x720")
+        main.geometry("300x420")
+
         PORT = 16383
         self.setup_lan_menu(main)
         main.mainloop()
@@ -50,9 +52,21 @@ class PlanningPokerApp:
 
         for widget in main.winfo_children():
             widget.destroy()
+
+        main.iconbitmap('assets/icon.ico') 
         
-        tk.Button(main, text="Héberger une Partie", command=lambda: HostGame(main)).pack(pady=10)
-        tk.Button(main, text="Rejoindre une Partie", command=lambda: ClientGame(main)).pack(pady=10)
+        background = tk.PhotoImage(file='assets/background.png')
+        img = tk.Label(main, image=background)
+        img.place(x=0, y=0, relwidth=1, relheight=1)
+
+        host_image = tk.PhotoImage(file='assets/host_button.png')
+        join_image = tk.PhotoImage(file='assets/join_button.png')
+
+        tk.Button(main, image=host_image, command=lambda: HostGame(main)).pack(pady=10)
+        tk.Button(main, image=join_image, command=lambda: ClientGame(main)).pack(pady=10)
+
+        main.mainloop()
+        
     
     
 # Classe pour héberger une partie
@@ -73,6 +87,10 @@ class HostGame:
         
         @param parent_window La fenêtre parente Tkinter
         """
+
+        self.parent = parent_window
+        self.parent.withdraw()
+
         self.PORT = 16383
         self.clients = []
         self.pseudo_list = []
@@ -84,8 +102,8 @@ class HostGame:
         self.window = tk.Toplevel(parent_window)
         self.window.title("Hôte - Planning Poker")
         self.window.protocol("WM_DELETE_WINDOW", self.on_window_close)
-        self.setup_host_interface()
         self.start_server_thread()
+        self.setup_host_interface()
 
     def on_window_close(self):
         """
@@ -131,16 +149,40 @@ class HostGame:
         """
 
         # Display IP
-        tk.Label(self.window, text=f"Votre IP : {self.IP}").pack(pady=5)
-        tk.Label(self.window, text="Communiquez votre IP aux joueurs pour rejoindre.").pack(pady=5)
+        self.police = tkfont.Font(family="Cascadia Code", size=12, weight="bold")
+        self.window.iconbitmap('assets/icon.ico') 
+
+        background = tk.PhotoImage(file='assets/background2.png')
+        img = tk.Label(self.window, image=background)
+        img.place(x=0, y=0, relwidth=1, relheight=1)
+
+        tk.Label(self.window, text=f"Votre IP : {self.IP}", bg="#0c5219", fg='white', font=self.police).pack(pady=5)
+        tk.Label(self.window, text="Communiquez votre IP aux joueurs pour rejoindre.", bg="#0c5219", fg='white', font=self.police).pack(pady=5)
 
         # Pseudos table
-        self.table = ttk.Treeview(self.window, columns=("Pseudo"), show="headings")
-        self.table.heading("Pseudo", text="Pseudos")
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure('Treeview.Heading',
+                        columns=("Pseudos",),
+                        font = self.police,
+                        background = "#061d0a",
+                        foreground = "white",
+                        rowheight = 30)
+
+        style.configure('Treeview',
+                        font = self.police,
+                        background = "#white",
+                        foreground = "black",
+                        rowheight = 30)
+
+        self.table = ttk.Treeview(self.window, columns=("Pseudos"), show="headings", style='Treeview')
+        self.table.column("Pseudos", anchor=tk.CENTER)
+        self.table.heading("Pseudos", text="Joueurs")
         self.table.pack(pady=5)
 
         # Game mode options
-        tk.Label(self.window, text="Mode de jeu :").pack()
+        self.mode_banner = tk.PhotoImage(file='assets/mode_banner.png')
+        tk.Label(self.window, image=self.mode_banner).pack()
         options = ['Majorité absolue', 'Majorité relative', 'Moyenne', 'Médiane']
 
         self.choix_var = tk.StringVar(self.window)
@@ -149,19 +191,24 @@ class HostGame:
         self.choix.pack(pady=20)
 
         # Backlog button
-        tk.Button(self.window, text="Parcourir backlog", command=self.parcourir).pack(pady=10)
+
+        backlog_button = tk.PhotoImage(file='assets/backlog_button.png')
+        tk.Button(self.window, image=backlog_button, command=self.parcourir).pack(pady=10)
 
         # Discussion time
-        tk.Label(self.window, text="Temps de discussion (secondes) :").pack(pady=2)
+        tk.Label(self.window, text="Temps de discussion (secondes) :", bg="#0c5219", fg='white', font=self.police).pack(pady=2)
         self.time_discussion_var = tk.StringVar(self.window, value="5")
         self.time_discussion_entry = tk.Entry(self.window, textvariable=self.time_discussion_var)
         self.time_discussion_entry.pack(pady=2)
 
         # Vote time
-        tk.Label(self.window, text="Temps de vote (secondes) :").pack(pady=2)
+        tk.Label(self.window, text="Temps de vote (secondes) :", bg="#0c5219", fg='white', font=self.police).pack(pady=2)
         self.time_vote_var = tk.StringVar(self.window, value="10")
         self.time_vote_entry = tk.Entry(self.window, textvariable=self.time_vote_var)
         self.time_vote_entry.pack(pady=2)
+
+        self.window.mainloop()
+
 
     def parcourir(self):
         """
@@ -178,12 +225,15 @@ class HostGame:
             with open(path, "r", encoding="utf-8") as file:
                 print('fichier chargé')
                 self.backlog = json.load(file)
-                tk.Button(self.window, text="Lancer la Partie", command=self.start_game).pack(pady=10)
-                result = tk.Label(self.window, text="Fichier chargé avec succès")
+                start_button = tk.PhotoImage(file='assets/start_button.png')
+                tk.Button(self.window, image=start_button, command=self.start_game).pack(pady=10)
+                result = tk.Label(self.window, text="Fichier chargé avec succès", bg="#0c5219", fg='lightgreen', font=self.police)
                 self.window.lift()
         else:
-            result = tk.Label(self.window, text="Aucun fichier chargé.")
+            result = tk.Label(self.window, text="Aucun fichier chargé.", bg="#0c5219", fg='red', font=self.police)
         result.pack()
+
+        self.window.mainloop()
 
     def start_server_thread(self):
         """
@@ -322,6 +372,9 @@ class HostGame:
 
         game_window = tk.Toplevel()
         game_window.title("Planning Poker - Partie en cours")
+        game_window.configure(bg='black')
+        game_window.iconbitmap('assets/icon.ico') 
+
 
         for client in self.clients:
             client.sendall(str(self.time_vote_var.get()).encode()) # On transmet à tous les utilisateurs le temps des votes
@@ -343,8 +396,8 @@ class HostGame:
                 condition = False
                 nb_rounds = 0
                 while not condition:
-                    tk.Label(game_window, text=f"Estimez la tâche suivante : {question}").pack()       
-                    tk.Label(game_window, text=f"En attente des votes... ").pack()
+                    tk.Label(game_window, text=f"Estimez la tâche suivante : {question}", bg="black", fg='white', font=self.police).pack(side="top")       
+                    tk.Label(game_window, text=f"En attente des votes... ", bg="black", fg='white', font=self.police).pack(side="top")
 
                     game_window.update()
 
@@ -364,7 +417,7 @@ class HostGame:
                                 print(lst)
                                 avg = sum(lst) / len(lst) if lst else 0
                                 self.resultat.append(avg)
-                                tk.Label(game_window, text=f"Moyenne : {avg}").pack()
+                                tk.Label(game_window, text=f"Moyenne : {avg}", bg="black", fg='white', font=self.police).pack(side="top")
 
                                 condition = True
 
@@ -381,17 +434,17 @@ class HostGame:
 
                                 self.resultat.append(med)
                 
-                                tk.Label(game_window, text=f"Mediane : {med}").pack()
+                                tk.Label(game_window, text=f"Mediane : {med}", bg="black", fg='white', font=self.police).pack(side="top")
                                 condition = True
 
                             case 'Majorité absolue':
 
                                 if len(set(self.votes)) == 1:
                                     self.resultat.append(int(self.votes[0]))
-                                    tk.Label(game_window, text=f"Majorité absolue ! : {self.votes[0]}").pack()   
+                                    tk.Label(game_window, text=f"Majorité absolue ! : {self.votes[0]}", bg="black", fg='white', font=self.police).pack(side="top")   
                                     condition = True
                                 else:
-                                    tk.Label(game_window, text=f"Pas de majorité absolue..").pack()   
+                                    tk.Label(game_window, text=f"Pas de majorité absolue..", bg="black", fg='white', font=self.police).pack(side="top")   
 
                             case 'Majorité relative':
 
@@ -401,18 +454,18 @@ class HostGame:
                                     value, freq = most_common[0]
                                     if freq > len(self.votes) / 2:
                                         self.resultat.append(int(value))
-                                        tk.Label(game_window, text=f"Majorité relative ! : {value}").pack()
+                                        tk.Label(game_window, text=f"Majorité relative ! : {value}", bg="black", fg='white', font=self.police).pack(side="top")
                                         condition = True
 
-                                tk.Label(game_window, text=f"Pas de majorité relative..").pack()
+                                tk.Label(game_window, text=f"Pas de majorité relative..", bg="black", fg='white', font=self.police).pack(side="top")
 
                     else:
                         if len(set(self.votes)) == 1:
                             self.resultat.append(int(self.votes[0]))
-                            tk.Label(game_window, text=f"Majorité absolue ! : {self.votes[0]}").pack()   
+                            tk.Label(game_window, text=f"Majorité absolue ! : {self.votes[0]}", bg="black", fg='white', font=self.police).pack(side="top")   
                             condition = True
                         else:
-                            tk.Label(game_window, text=f"Pas de majorité absolue..").pack()
+                            tk.Label(game_window, text=f"Pas de majorité absolue..", bg="black", fg='white', font=self.police).pack(side="top")
 
 
                     for client in self.clients: ## On fait un feedback à tous les clients
@@ -433,8 +486,8 @@ class HostGame:
                     if not condition:   # Temps de disccussion
 
                         countdown_time = int(self.time_discussion_var.get()) # On récupere les paramètres de la partie
-                        countdown_label = tk.Label(game_window, text=f"Temps restant: {countdown_time}", font=("Helvetica", 16))
-                        countdown_label.pack(pady=10)
+                        countdown_label = tk.Label(game_window, text=f"Temps restant: {countdown_time}", bg="black", fg='white', font=self.police)
+                        countdown_label.pack(side="top")
 
                         while countdown_time > 0:
                             countdown_label.config(text=f"Temps restant: {countdown_time}")
@@ -493,8 +546,13 @@ class HostGame:
 
         print('Fichier sauvegardé')
 
-        tk.Label(game_window, text="Fin de la partie").pack()
-        tk.Button(game_window, text="Quitter", command=lambda : self.fin_partie(game_window)).pack()
+        tk.Label(game_window, text="Fin de la partie", bg="black", fg='white', font=self.police).pack(side="top")
+
+        quit_button = tk.PhotoImage(file='assets/quit_button.png')
+        tk.Button(game_window, image=quit_button, command=lambda : self.fin_partie(game_window)).pack(padx=20, pady=20)
+
+        ## ATTENTION
+        game_window.mainloop()
 
     def fin_partie(self, game_window):
         """
@@ -506,6 +564,9 @@ class HostGame:
         - Ferme la connexion du server
         - Reinisialise les variables
         """
+
+        game_window.destroy()
+        
         # Fermeture de tous les clients
         for client in self.clients:
             try:
@@ -513,13 +574,14 @@ class HostGame:
             except:
                 pass
         
-        game_window.destroy()
-        
         # Réinitialisez pour une nouvelle partie
         self.stop_server.clear()
         self.started = False
         self.clients = []
         self.pseudo_list = []
+
+        self.parent.deiconify() # On réaffiche la fenetre principale
+
 
     def collect_votes(self, game_window):
         """
@@ -546,7 +608,7 @@ class HostGame:
                     continue
 
         # Si tous les votes sont reçus, afficher les résultats
-        tk.Label(game_window, text=f"Votes reçus : {', '.join(self.votes)}").pack()
+        tk.Label(game_window, text=f"Votes reçus : {', '.join(self.votes)}", bg="black", fg='white', font=self.police).pack()
         print(self.votes)  # Affiche les votes reçus
 
     def clear_window(self):
@@ -575,8 +637,12 @@ class ClientGame:
         @param parent_window La fenêtre parente Tkinter
         """
 
+        self.parent = parent_window
+        self.parent.withdraw()
+
         self.window = tk.Toplevel(parent_window)
         self.window.title("Client - Planning Poker")
+        self.window.iconbitmap('assets/icon.ico') 
         self.conn = None
         self.pseudo = ''
         self.setup_client_interface()
@@ -589,15 +655,25 @@ class ClientGame:
         - Champ pour l'IP et pour le pseudo
         - Bouton 'Se connecter'
         """
-        tk.Label(self.window, text="IP du Serveur:").grid(row=0, column=0, padx=10, pady=5)
+
+        self.police = tkfont.Font(family="Cascadia Code", size=12, weight="bold")
+
+        background = tk.PhotoImage(file='assets/background.png')
+        img = tk.Label(self.window, image=background)
+        img.place(x=0, y=0, relwidth=1, relheight=1)
+
+        tk.Label(self.window, text="IP du Serveur:", bg="#0c5219", fg='white', font=self.police).grid(row=0, column=0, padx=10, pady=5)
         self.entry_ip = tk.Entry(self.window)
         self.entry_ip.grid(row=0, column=1, padx=10, pady=5)
         
-        tk.Label(self.window, text="Votre Pseudo:").grid(row=1, column=0, padx=10, pady=5)
+        tk.Label(self.window, text="Votre Pseudo:", bg="#0c5219", fg='white', font=self.police).grid(row=1, column=0, padx=10, pady=5)
         self.entry_pseudo = tk.Entry(self.window)
         self.entry_pseudo.grid(row=1, column=1, padx=10, pady=5)
 
-        tk.Button(self.window, text="Se Connecter", command=self.connect_to_server).grid(row=2, column=1, pady=10)
+        connect_button = tk.PhotoImage(file='assets/connect_button.png')
+        tk.Button(self.window, image=connect_button, command=self.connect_to_server).grid(row=2, column=1, pady=15, padx=55)
+
+        self.window.mainloop()
 
     # Connection au serveur
     def connect_to_server(self):
@@ -627,10 +703,31 @@ class ClientGame:
         """
 
         self.clear_window()
-        tk.Label(self.window, text="En attente du démarrage de la partie...").pack(pady=10)
-        self.table = ttk.Treeview(self.window, columns=("Pseudo"), show="headings")
-        self.table.heading("Pseudo", text="Pseudos")
-        self.table.pack(pady=5)
+
+        self.window.config(bg='#0c5219')
+        tk.Label(self.window, text="En attente du démarrage de la partie...", bg="#0c5219", fg='white', font=self.police).pack(pady=30, padx=30)
+
+        # Pseudos table
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure('Treeview.Heading',
+                        columns=("Pseudos",),
+                        font = self.police,
+                        background = "#061d0a",
+                        foreground = "white",
+                        rowheight = 30)
+
+        style.configure('Treeview',
+                        font = self.police,
+                        background = "#white",
+                        foreground = "black",
+                        rowheight = 30)
+
+
+        self.table = ttk.Treeview(self.window, columns=("Pseudo"), show="headings", style='Treeview')
+        self.table.heading("Pseudo", text="Joueur")
+        self.table.column("Pseudo", anchor=tk.CENTER)
+        self.table.pack(pady=30, padx=30)
 
     # Mettre a jour la table des utilisateurs
     def update_table(self, pseudos):
@@ -674,17 +771,20 @@ class ClientGame:
             - @@END@@ : Signifie la fin de la partie
         """
         # Interface principale pour la partie
+ 
         game_window = tk.Toplevel()
         game_window.title("Planning Poker - Partie en cours")
+        game_window.iconbitmap('assets/icon.ico')
+        game_window.config(bg='#0c5219')
 
         # Initialisation des paramètres de jeu
         self.server_time_vote = int(self.conn.recv(1024).decode())
         self.time_discussion_var = tk.StringVar(value="5")  # Temps de discussion par défaut
 
         # Création des widgets
-        self.label_info = tk.Label(game_window, text="En attente des autres votes...")
-        self.label_question = tk.Label(game_window, text="Question : ", font=("Helvetica", 14))
-        self.label_vote = tk.Label(game_window, text="Votre Vote :")
+        self.label_info = tk.Label(game_window, text="En attente des autres votes...", bg="#0c5219", fg='white', font=self.police)
+        self.label_question = tk.Label(game_window, text="Question : ", bg="#0c5219", fg='white', font=self.police)
+        self.label_vote = tk.Label(game_window, text="Choisissez une carte :", bg="#0c5219", fg='white', font=self.police)
 
         self.vote_entry = tk.Entry(game_window)
 
@@ -721,9 +821,24 @@ class ClientGame:
         self.time_vote_label = tk.Label(game_window, text="", font=("Helvetica", 16))
         self.countdown_label = tk.Label(game_window, text="", font=("Helvetica", 16))
 
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure('Treeview.Heading',
+                        columns=("Pseudo","Vote"),
+                        font = self.police,
+                        background = "#061d0a",
+                        foreground = "white",
+                        rowheight = 30)
+
+        style.configure('Treeview',
+                        font = self.police,
+                        background = "#white",
+                        foreground = "black",
+                        rowheight = 30)
+
         # Création de la table de feedback
-        self.feedback_table = ttk.Treeview(game_window, columns=("Pseudo", "Vote"), show="headings")
-        self.feedback_table.heading("Pseudo", text="Pseudo")
+        self.feedback_table = ttk.Treeview(game_window, columns=("Pseudo", "Vote"), show="headings", style='Treeview')
+        self.feedback_table.heading("Pseudo", text="Joueur")
         self.feedback_table.heading("Vote", text="Vote")
 
         # Pack initial des widgets principaux
@@ -748,14 +863,14 @@ class ClientGame:
 
             if self.remaining_time > 0:
                 # Mettre à jour le label de temps
-                self.time_vote_label.config(text=f"Temps restant: {self.remaining_time}")
+                self.time_vote_label.config(text=f"Temps restant: {self.remaining_time}", bg="#0c5219", fg='white', font=self.police)
                 self.remaining_time -= 1
                 
                 # Reprogrammer le décompte
                 self.vote_timer = game_window.after(1000, update_countdown)
             else:
                 # Temps écoulé
-                self.time_vote_label.config(text="Temps écoulé !")
+                self.time_vote_label.config(text="Temps écoulé !", bg="#0c5219", fg='white', font=self.police)
                 self.time_vote_label.pack_forget()
 
                 # Envoyer un vote automatique si pas déjà voté
@@ -919,11 +1034,11 @@ class ClientGame:
                 # Gestion du temps de discussion si pas de majorité
                 if not condition:
                     countdown_time = int(self.time_discussion_var.get())
-                    self.countdown_label.config(text=f"Temps de discussion : {countdown_time}")
+                    self.countdown_label.config(text=f"Temps de discussion : {countdown_time}", bg="#0c5219", fg='white', font=self.police)
                     self.countdown_label.pack(pady=10)
 
                     while countdown_time > 0:
-                        self.countdown_label.config(text=f"Temps de discussion : {countdown_time}")
+                        self.countdown_label.config(text=f"Temps de discussion : {countdown_time}", bg="#0c5219", fg='white', font=self.police)
                         game_window.update()
                         time.sleep(1)
                         countdown_time -= 1
@@ -939,7 +1054,7 @@ class ClientGame:
             
             elif question:
                 # Nouvelle question
-                self.label_question.config(text=f"Question : {question}")
+                self.label_question.config(text=f"Question : {question}", bg="#0c5219", fg='white', font=self.police)
                 print('Nouvelle question')
                 start_countdown()
 
@@ -949,8 +1064,14 @@ class ClientGame:
         for widget in game_window.winfo_children():
             widget.destroy()
         
-        tk.Label(game_window, text="Fin de la partie").pack()
-        tk.Button(game_window, text="Quitter", command=lambda : self.fin_partie(game_window)).pack()
+        tk.Label(game_window, text="Fin de la partie", bg="#0c5219", fg='white', font=self.police).pack(pady=20)
+        tk.Label(game_window, text="Toutes les tâches ont été enregistrées sur le server", bg="#0c5219", fg='white', font=self.police).pack(pady=20)
+        tk.Label(game_window, text="Merci pour ta participation !", bg="#0c5219", fg='white', font=self.police).pack(pady=20)
+
+        tk.Button(game_window, text="QUITTER", command=lambda : self.fin_partie(game_window), bg="white", fg='black', font=self.police).pack(padx=20, pady=20)
+
+        ## ATTENTION
+        game_window.mainloop()
 
     
     def fin_partie(self, game_window):
@@ -963,8 +1084,9 @@ class ClientGame:
         """
         game_window.destroy()
         self.conn.close()
+
+        self.parent.deiconify() # On réaffiche la fenetre principale
         
-    
     # Reinisialiser l'interface
     def clear_window(self):
         """
