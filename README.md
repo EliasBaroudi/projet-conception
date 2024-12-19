@@ -59,51 +59,56 @@ $ python .\interfacev6
 
 - Utilisation de l'interface :
 
-Menu principal :
-<div align="center">
-  <img src="screenshots/main.png" alt="Menu principal" width="600"/>
-  <p><em>L'écran d'accueil vous permet de choisir entre héberger une partie (HOST) ou rejoindre une partie existante (JOIN)</em></p>
-</div>
+**🎮 L'écran d'accueil**  
+Votre point d'entrée dans l'application où vous pouvez choisir entre héberger une nouvelle partie (HOST) ou rejoindre une partie existante (JOIN).
+
+<img src="screenshots/main.png" alt="Menu principal" width="600"/>
 
 Côté hôte :
    
-Cliquer le bouton 'HOST'
-![host](screenshots/host.png)
+### Mode Hôte
 
-- Choisir le fichier du backlog
-- Définir les paramètres de la partie (temps de discussion, de vote et mode de jeu)
-- Quand tous les joueurs sont connectés : cliquez 'START'
+**🎲 Configuration de la partie**  
+En tant qu'hôte, vous pourrez configurer tous les paramètres de votre session :
+- Sélection du fichier de backlog
+- Paramétrage des temps de discussion et de vote
+- Configuration du mode de jeu
+- Lancement de la partie une fois l'équipe au complet
 
-Aperçu de la console :
-![host](screenshots/console.png)
+<img src="screenshots/host.png" alt="Interface hôte" width="600"/>
 
-Cette interface permet à l'hôte de consulter : 
-- La question actuellement traitée
-- L'avancement de la partie
-- Les votes reçus
-- L'état de la validation de la condition de victoire de la partie (Majorité absolue, Majorité relative, Moyenne ou Médiane)
+**📊 Console de supervision**  
+Un tableau de bord complet pour suivre votre session en temps réel :
+- Visualisation de la question en cours
+- Suivi de l'avancement de la partie
+- Monitoring des votes reçus
+- Vérification des conditions de victoire
 
-Côté utilisateur : 
+<img src="screenshots/console.png" alt="Console hôte" width="600"/>
 
-Cliquer le bouton 'JOIN'
-![host](screenshots/join.png)
+### Mode Joueur
 
-- Renseigner l'ip de l'hôte
-- Renseigner son nom d'utilisateur
-- Cliquer sur 'CONNECT'
+**🔑 Connexion à la partie**  
+Rejoignez facilement une session en cours :
+- Entrez l'IP de l'hôte
+- Choisissez votre nom d'utilisateur
+- Connectez-vous à la partie
 
-Aperçu de la salle d'attente
-![host](screenshots/waiting.png)
+**⌛ Salle d'attente**  
+Préparez-vous au démarrage de la session :
+- Visualisez les autres participants en temps réel
+- Attendez le signal de l'hôte pour commencer
 
-- Temps d'attente avant le lancement de la partie, il faut attendre que l'hôte décide de lancer la partie
-- Actualisation de l'interface lorsqu'un nouveau joueur se connecte
+<img src="screenshots/waiting.png" alt="Salle d'attente" width="600"/>
 
-Une fois que l'hôte a lancé la partie 
-![host](screenshots/play.png)
 
-- Affichage de la question actuellement traitée
-- Affichage des cartes pour voter
-- Affichage du temps restant
+**🎯 Interface de jeu**  
+Participez activement à l'estimation des tâches :
+- Consultez la question/tâche actuelle
+- Sélectionnez votre carte de vote
+- Gardez un œil sur le temps restant
+
+<img src="screenshots/play.png" alt="Interface de jeu" width="600"/>
 
 Une fois que la partie est terminée, l'hôte et les joueurs peuvent quitter la fenêtre de jeu et relancer une partie s'ils le souhaitent.
 
