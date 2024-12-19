@@ -226,7 +226,7 @@ class HostGame:
         )
         if path:
             with open(path, "r", encoding="utf-8") as file:
-                print('fichier chargé')
+                print('Fichier chargé')
                 self.backlog = json.load(file)
                 start_button = tk.PhotoImage(file='assets/start_button.png')
                 tk.Button(self.window, image=start_button, command=self.start_game).pack(pady=10)
@@ -369,8 +369,6 @@ class HostGame:
         """
         self.paused = False
         self.mode = self.choix_var.get()
-        print(self.mode)
-
         self.resultat = []
 
         
@@ -382,7 +380,7 @@ class HostGame:
 
 
         for client in self.clients:
-            client.sendall(str(self.time_vote_var.get()).encode()) # On transmet à tous les utilisateurs le temps des votes
+            client.sendall(str(self.time_vote_var.get()+':'+self.time_discussion_var.get()).encode()) # On transmet à tous les utilisateurs le temps des votes
 
 
         n=1
@@ -392,11 +390,8 @@ class HostGame:
             
                 question = value
                 for client in self.clients:
-                    print('QUESTION')
                     client.sendall(question.encode())
                 # Interface principale pour la partie
-
-                print(question)
 
                 condition = False
                 nb_rounds = 0
@@ -419,7 +414,6 @@ class HostGame:
                             case 'Moyenne':
 
                                 lst = [0 if int(x) == -1 else int(x) for x in self.votes]
-                                print(lst)
                                 avg = sum(lst) / len(lst) if lst else 0
                                 self.resultat.append(avg)
                                 tk.Label(game_window, text=f"Moyenne : {avg}", bg="black", fg='white', font=self.police).pack(side="top")
@@ -475,8 +469,6 @@ class HostGame:
 
                     for client in self.clients: ## On fait un feedback à tous les clients
                         tag = '@@FEEDBACK@@'
-                        print('FEEDBACK')
-                        print(self.full_list)
                         client.sendall(tag.encode())
 
                         full_char = []
@@ -484,7 +476,6 @@ class HostGame:
                             full_char.append(':'.join(el))
 
                         full_char = str(int(condition)) + ';'.join(full_char) # On transmet l'état de la condition de la question ainsi que la liste de tous les votes
-                        print(full_char)
                         client.sendall(full_char.encode())
                     
 
@@ -506,21 +497,18 @@ class HostGame:
 
                     for client in self.clients: ## On prévient les clients qu'on passe à l'étape suivante
                         tag = '@@NEW@@'
-                        print('NEW')
                         client.sendall(tag.encode())
 
                     time.sleep(1)
 
                     if not condition:
                         for client in self.clients:
-                            print('QUESTION')
                             client.sendall(question.encode())
 
                     nb_rounds += 1
 
             n += 1 # Incrémente le nb de questions 
         except Exit:
-            print('Fin de partie prématurée')
             self.paused = True
 
         for client in self.clients:
@@ -614,7 +602,6 @@ class HostGame:
 
         # Si tous les votes sont reçus, afficher les résultats
         tk.Label(game_window, text=f"Votes reçus : {', '.join(self.votes)}", bg="black", fg='white', font=self.police).pack()
-        print(self.votes)  # Affiche les votes reçus
 
     def clear_window(self):
         """
@@ -785,8 +772,9 @@ class ClientGame:
         game_window.config(bg='#0c5219')
 
         # Initialisation des paramètres de jeu
-        self.server_time_vote = int(self.conn.recv(1024).decode())
-        self.time_discussion_var = tk.StringVar(value="60")  # Temps de discussion par défaut
+        data = str(self.conn.recv(1024).decode()).split(':')
+        self.server_time_vote = int(data[0])
+        self.time_discussion_var = int(data[1]) # Temps de discussion par défaut
 
         # Création des widgets
         self.label_info = tk.Label(game_window, text="En attente des autres votes...", bg="#0c5219", fg='white', font=self.police)
@@ -1039,7 +1027,7 @@ class ClientGame:
 
                 # Gestion du temps de discussion si pas de majorité
                 if not condition:
-                    countdown_time = int(self.time_discussion_var.get())
+                    countdown_time = int(self.time_discussion_var)
                     self.countdown_label.config(text=f"Temps de discussion : {countdown_time}", bg="#0c5219", fg='white', font=self.police)
                     self.countdown_label.pack(pady=10)
 
