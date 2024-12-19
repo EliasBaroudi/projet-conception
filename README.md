@@ -110,7 +110,7 @@ Participez activement à l'estimation des tâches :
 <img src="screenshots/play.png" alt="Interface de jeu" width="300"/>
 
 **🗣️ Interface de discussion**  
-Il est temps d'en parler
+Il est temps d'en parler !
 - Consultez les votes des autres joueurs
 - Gardez un œil sur le temps restant
 
