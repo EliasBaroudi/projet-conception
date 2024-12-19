@@ -6,6 +6,7 @@ import threading
 import json
 from collections import Counter
 import time
+import os
 
 class Exit(Exception):
     """
@@ -222,6 +223,7 @@ class HostGame:
 
         path = filedialog.askopenfilename(
             title="Sélectionnez un fichier JSON",
+            initialdir=os.getcwd(),  # Spécifiez le répertoire initial
             filetypes=[("Fichiers JSON", "*.json"), ("Tous les fichiers", "*.*")]
         )
         if path:
