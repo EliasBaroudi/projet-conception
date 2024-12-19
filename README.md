@@ -1,4 +1,4 @@
-# Nom du Projet
+# Planning Poker
 
 Ce projet à été réalisé dans le cadre du cours de CAPI (Conception Agile de Projet Informatique), dans le but de nous apprendre les principales techniques de gestion de développement de projet informatique.
 L'application réalisée est une application connue dans ce milieu, le Planning Poker.
@@ -11,6 +11,7 @@ L'application réalisée est une application connue dans ce milieu, le Planning 
 2. [Fonctionnalités](#fonctionnalités)
 3. [Installation](#installation)
 4. [Utilisation](#utilisation)
+5. [Considérations](#considérations)
 
 ---
 
@@ -20,9 +21,6 @@ Ajoute une capture d'écran ou une courte démo du projet ici pour donner une id
 
 ---
 
-
-
-
 ## Fonctionnalités
 
 - Charger un backlog 
@@ -31,14 +29,8 @@ Ajoute une capture d'écran ou une courte démo du projet ici pour donner une id
 - Parties en local (sur le même réseau)
 - Nombre de joueurs illimités
 - Partie hôte : fonctionne comme un server : logs, résultats, avancement de la partie...
-
-
-
   
 ---
-
-
-
 
 ## Installation
 
@@ -54,9 +46,6 @@ $ cd projet-conception
 # Installez les dépendances (conseillé de le faire dans un environnement créé au préalable)
 $ pip install -r requirements.txt
 ```
-
-
-
 
 ## Utilisation
 
@@ -76,8 +65,6 @@ Votre point d'entrée dans l'application où vous pouvez choisir entre héberger
 
 <img src="screenshots/main.png" alt="Menu principal" width="300"/>
 
-
-   
 ### Mode Hôte
 
 **🎲 Configuration de la partie**  
@@ -97,9 +84,6 @@ Un tableau de bord complet pour suivre votre session en temps réel :
 - Vérification des conditions de victoire
 
 <img src="screenshots/console.png" alt="Console hôte" width="300"/>
-
-
-
 
 ### Mode Joueur
 
@@ -127,9 +111,6 @@ Participez activement à l'estimation des tâches :
 
 Une fois que la partie est terminée, l'hôte et les joueurs peuvent quitter la fenêtre de jeu et relancer une partie s'ils le souhaitent.
 
-
-
-
 ## Considérations : 
 
 Le backlog chargé doit être doté de l'extension .json et sous la forme suivante :
@@ -156,9 +137,6 @@ Attention, un nouveau backlog contenant les questions non traitées sera écrit 
 Le premier tour de la partie sera toujours jugé selon la majorité absolue, laissant l'opportunité aux joueurs de discuter des tâches.
 
 Tous les joueurs disposent d'un temps imparti pour voter, si un joueur ne vote pas, un vote nul (vote 0) est envoyé au server.
-
-
-
 
 ## Remerciements
 
