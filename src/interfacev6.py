@@ -200,13 +200,13 @@ class HostGame:
 
         # Discussion time
         tk.Label(self.window, text="Temps de discussion (secondes) :", bg="#0c5219", fg='white', font=self.police).pack(pady=2)
-        self.time_discussion_var = tk.StringVar(self.window, value="5")
+        self.time_discussion_var = tk.StringVar(self.window, value="60")
         self.time_discussion_entry = tk.Entry(self.window, textvariable=self.time_discussion_var)
         self.time_discussion_entry.pack(pady=2)
 
         # Vote time
         tk.Label(self.window, text="Temps de vote (secondes) :", bg="#0c5219", fg='white', font=self.police).pack(pady=2)
-        self.time_vote_var = tk.StringVar(self.window, value="10")
+        self.time_vote_var = tk.StringVar(self.window, value="30")
         self.time_vote_entry = tk.Entry(self.window, textvariable=self.time_vote_var)
         self.time_vote_entry.pack(pady=2)
 
@@ -786,7 +786,7 @@ class ClientGame:
 
         # Initialisation des paramètres de jeu
         self.server_time_vote = int(self.conn.recv(1024).decode())
-        self.time_discussion_var = tk.StringVar(value="5")  # Temps de discussion par défaut
+        self.time_discussion_var = tk.StringVar(value="60")  # Temps de discussion par défaut
 
         # Création des widgets
         self.label_info = tk.Label(game_window, text="En attente des autres votes...", bg="#0c5219", fg='white', font=self.police)
