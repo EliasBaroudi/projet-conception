@@ -1,4 +1,10 @@
 {
-    "1": "Ajouter un bouton",
-    "2": "Gérer le backlog"
+    "1": "Configurer l'environnement de développement",
+    "2": "Créer la base de données",
+    "3": "Développer l'interface utilisateur",
+    "4": "Intégrer l'API externe",
+    "5": "Mettre en place l'authentification",
+    "6": "Écrire des tests unitaires",
+    "7": "Optimiser les performances backend",
+    "8": "Déployer sur serveur de production"
 }
