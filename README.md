@@ -60,8 +60,11 @@ $ python .\interfacev6
 - Utilisation de l'interface :
 
 Menu principal :
-![main](screenshots/main.png)
-  
+<div align="center">
+  <img src="screenshots/main.png" alt="Menu principal" width="600"/>
+  <p><em>L'écran d'accueil vous permet de choisir entre héberger une partie (HOST) ou rejoindre une partie existante (JOIN)</em></p>
+</div>
+
 Côté hôte :
    
 Cliquer le bouton 'HOST'
