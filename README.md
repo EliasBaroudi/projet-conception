@@ -55,7 +55,7 @@ Il est conseillé pour un test sur la même machine d'avoir un terminal pour sim
 ```bash
 # Exemple d'exécution du projet
 $ cd src/
-$ python .\interfacev6
+$ python3 interfacev6.py
 ```
 
 - Utilisation de l'interface :
