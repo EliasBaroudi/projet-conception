@@ -407,7 +407,7 @@ class HostGame:
 
         for client in self.clients:
             client.sendall(str(self.time_vote_var.get()+':'+self.time_discussion_var.get()).encode()) # On transmet à tous les utilisateurs le temps des votes
-
+        time.sleep(1)
 
         n=1
         # On parcourt toutes les questions dans le backlog
