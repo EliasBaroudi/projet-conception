@@ -7,6 +7,7 @@ import json
 from collections import Counter
 import time
 import os
+import sys
 
 class Exit(Exception):
     """
@@ -56,8 +57,14 @@ class PlanningPokerApp:
         for widget in main.winfo_children():
             widget.destroy()
 
-        main.iconbitmap('assets/icon.ico') 
-        
+        if sys.platform == "win32":
+            # Windows : utiliser un fichier .ico
+            main.iconbitmap('assets/icon.ico')
+        else:
+            # Linux et Mac : utiliser un fichier .png
+            icon = tk.PhotoImage('assets/icon.png')
+            main.tk.call('wm', 'iconphoto', main._w, icon)
+
         background = tk.PhotoImage(file='assets/background.png')
         img = tk.Label(main, image=background)
         img.place(x=0, y=0, relwidth=1, relheight=1)
@@ -153,7 +160,16 @@ class HostGame:
 
         # Display IP
         self.police = tkfont.Font(family="Cascadia Code", size=12, weight="bold")
-        self.window.iconbitmap('assets/icon.ico') 
+        
+
+        if sys.platform == "win32":
+            # Windows : utiliser un fichier .ico
+            self.window.iconbitmap('assets/icon.ico')
+        else:
+            # Linux et Mac : utiliser un fichier .png
+            icon = tk.PhotoImage('assets/icon.png')
+            self.window.tk.call('wm', 'iconphoto', self.window._w, icon)
+
         self.window.resizable(False, False) 
 
         background = tk.PhotoImage(file='assets/background2.png')
@@ -378,8 +394,16 @@ class HostGame:
         game_window.resizable(False, False) 
         game_window.title("Planning Poker - Partie en cours")
         game_window.configure(bg='black')
-        game_window.iconbitmap('assets/icon.ico') 
 
+        if sys.platform == "win32":
+            # Windows : utiliser un fichier .ico
+            game_window.iconbitmap('assets/icon.ico')
+        else:
+            # Linux et Mac : utiliser un fichier .png
+            icon = tk.PhotoImage('assets/icon.png')
+            game_window.tk.call('wm', 'iconphoto', game_window._w, icon)
+
+        
 
         for client in self.clients:
             client.sendall(str(self.time_vote_var.get()+':'+self.time_discussion_var.get()).encode()) # On transmet à tous les utilisateurs le temps des votes
@@ -637,7 +661,16 @@ class ClientGame:
         self.window = tk.Toplevel(parent_window)
         self.window.resizable(False, False) 
         self.window.title("Client - Planning Poker")
-        self.window.iconbitmap('assets/icon.ico') 
+
+        if sys.platform == "win32":
+            # Windows : utiliser un fichier .ico
+            self.window.iconbitmap('assets/icon.ico')
+        else:
+            # Linux et Mac : utiliser un fichier .png
+            icon = tk.PhotoImage('assets/icon2.png')
+            self.window.tk.call('wm', 'iconphoto', self.window._w, icon)
+        
+
         self.conn = None
         self.pseudo = ''
         self.setup_client_interface()
@@ -770,7 +803,16 @@ class ClientGame:
         game_window = tk.Toplevel()
         game_window.resizable(False, False) 
         game_window.title("Planning Poker - Partie en cours")
-        game_window.iconbitmap('assets/icon.ico')
+        
+        
+        if sys.platform == "win32":
+            # Windows : utiliser un fichier .ico
+            game_window.iconbitmap('assets/icon.ico')
+        else:
+            # Linux et Mac : utiliser un fichier .png
+            icon = tk.PhotoImage('assets/icon2.png')
+            game_window.tk.call('wm', 'iconphoto', game_window._w, icon)
+
         game_window.config(bg='#0c5219')
 
         # Initialisation des paramètres de jeu
