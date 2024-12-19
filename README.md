@@ -38,7 +38,7 @@ Suivez les intstructions suivantes affin d'installer l'application sur votre mac
 
 ```bash
 # Clonez le repo
-$ git clone https://github.com/EliasBaroudi/projet-conception/tree/main
+$ git clone https://github.com/EliasBaroudi/projet-conception
 
 # Accédez au dossier du projet
 $ cd projet-conception
