@@ -1,4 +1,4 @@
-# Planning Poker
+![banner](screenshots/banner.png)
 
 Ce projet à été réalisé dans le cadre du cours de CAPI (Conception Agile de Projet Informatique), dans le but de nous apprendre les principales techniques de gestion de développement de projet informatique.
 L'application réalisée est une application connue dans ce milieu, le Planning Poker.
