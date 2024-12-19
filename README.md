@@ -62,7 +62,7 @@ $ python .\interfacev6
 **🎮 L'écran d'accueil**  
 Votre point d'entrée dans l'application où vous pouvez choisir entre héberger une nouvelle partie (HOST) ou rejoindre une partie existante (JOIN).
 
-<img src="screenshots/main.png" alt="Menu principal" width="600"/>
+<img src="screenshots/main.png" alt="Menu principal" width="300"/>
 
 Côté hôte :
    
@@ -75,7 +75,7 @@ En tant qu'hôte, vous pourrez configurer tous les paramètres de votre session 
 - Configuration du mode de jeu
 - Lancement de la partie une fois l'équipe au complet
 
-<img src="screenshots/host.png" alt="Interface hôte" width="600"/>
+<img src="screenshots/host.png" alt="Interface hôte" width="300"/>
 
 **📊 Console de supervision**  
 Un tableau de bord complet pour suivre votre session en temps réel :
@@ -84,7 +84,7 @@ Un tableau de bord complet pour suivre votre session en temps réel :
 - Monitoring des votes reçus
 - Vérification des conditions de victoire
 
-<img src="screenshots/console.png" alt="Console hôte" width="600"/>
+<img src="screenshots/console.png" alt="Console hôte" width="300"/>
 
 ### Mode Joueur
 
@@ -99,7 +99,7 @@ Préparez-vous au démarrage de la session :
 - Visualisez les autres participants en temps réel
 - Attendez le signal de l'hôte pour commencer
 
-<img src="screenshots/waiting.png" alt="Salle d'attente" width="600"/>
+<img src="screenshots/waiting.png" alt="Salle d'attente" width="300"/>
 
 
 **🎯 Interface de jeu**  
@@ -108,7 +108,7 @@ Participez activement à l'estimation des tâches :
 - Sélectionnez votre carte de vote
 - Gardez un œil sur le temps restant
 
-<img src="screenshots/play.png" alt="Interface de jeu" width="600"/>
+<img src="screenshots/play.png" alt="Interface de jeu" width="300"/>
 
 Une fois que la partie est terminée, l'hôte et les joueurs peuvent quitter la fenêtre de jeu et relancer une partie s'ils le souhaitent.
 
