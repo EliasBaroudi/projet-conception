@@ -34,7 +34,7 @@ Ajoute une capture d'écran ou une courte démo du projet ici pour donner une id
 
 ## Installation
 
-Explique comment installer et configurer ton projet localement.
+Suivez les intstructions suivantes affin d'installer l'application sur votre machine.
 
 ```bash
 # Clonez le repo
