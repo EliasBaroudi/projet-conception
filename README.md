@@ -109,6 +109,13 @@ Participez activement à l'estimation des tâches :
 
 <img src="screenshots/play.png" alt="Interface de jeu" width="300"/>
 
+**🗣️ Interface de discussion**  
+Il est temps d'en parler
+- Consultez les votes des autres joueurs
+- Gardez un œil sur le temps restant
+
+<img src="screenshots/feedback.png" alt="Interface de discussion" width="300"/>
+
 Une fois que la partie est terminée, l'hôte et les joueurs peuvent quitter la fenêtre de jeu et relancer une partie s'ils le souhaitent.
 
 ## Considérations : 
