@@ -34,6 +34,8 @@ class PlanningPokerApp:
         main = tk.Tk()
         main.title("Planning Poker")
         main.geometry("300x420")
+        main.resizable(False, False) 
+
 
         PORT = 16383
         self.setup_lan_menu(main)
@@ -151,6 +153,7 @@ class HostGame:
         # Display IP
         self.police = tkfont.Font(family="Cascadia Code", size=12, weight="bold")
         self.window.iconbitmap('assets/icon.ico') 
+        self.window.resizable(False, False) 
 
         background = tk.PhotoImage(file='assets/background2.png')
         img = tk.Label(self.window, image=background)
@@ -370,7 +373,9 @@ class HostGame:
 
         self.resultat = []
 
+        
         game_window = tk.Toplevel()
+        game_window.resizable(False, False) 
         game_window.title("Planning Poker - Partie en cours")
         game_window.configure(bg='black')
         game_window.iconbitmap('assets/icon.ico') 
@@ -641,6 +646,7 @@ class ClientGame:
         self.parent.withdraw()
 
         self.window = tk.Toplevel(parent_window)
+        self.window.resizable(False, False) 
         self.window.title("Client - Planning Poker")
         self.window.iconbitmap('assets/icon.ico') 
         self.conn = None
@@ -773,6 +779,7 @@ class ClientGame:
         # Interface principale pour la partie
  
         game_window = tk.Toplevel()
+        game_window.resizable(False, False) 
         game_window.title("Planning Poker - Partie en cours")
         game_window.iconbitmap('assets/icon.ico')
         game_window.config(bg='#0c5219')
@@ -824,7 +831,6 @@ class ClientGame:
         style = ttk.Style()
         style.theme_use("clam")
         style.configure('Treeview.Heading',
-                        columns=("Pseudo","Vote"),
                         font = self.police,
                         background = "#061d0a",
                         foreground = "white",
