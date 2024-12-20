@@ -145,3 +145,6 @@ Le premier tour de la partie sera toujours jugé selon la majorité absolue, lai
 
 Tous les joueurs disposent d'un temps imparti pour voter, si un joueur ne vote pas, un vote nul (vote 0) est envoyé au server.
 
+## Documentation :
+
+gitHub Pages (Doxygen) : https://eliasbaroudi.github.io/projet-conception/html/index.html 
