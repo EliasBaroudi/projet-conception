@@ -15,12 +15,6 @@ L'application réalisée est une application connue dans ce milieu, le Planning 
 
 ---
 
-## Aperçu du Projet
-
-Ajoute une capture d'écran ou une courte démo du projet ici pour donner une idée claire de ce qu'il fait.
-
----
-
 ## Fonctionnalités
 
 - Charger un backlog 
