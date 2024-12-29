@@ -7,11 +7,10 @@ L'application réalisée est une application connue dans ce milieu, le Planning 
 
 ## Table des matières
 
-1. [Aperçu du Projet](#aperçu-du-projet)
-2. [Fonctionnalités](#fonctionnalités)
-3. [Installation](#installation)
-4. [Utilisation](#utilisation)
-5. [Considérations](#considérations)
+1. [Fonctionnalités](#fonctionnalités)
+2. [Installation](#installation)
+3. [Utilisation](#utilisation)
+4. [Considérations](#considérations)
 
 ---
 
